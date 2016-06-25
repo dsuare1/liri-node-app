@@ -33,11 +33,6 @@ function myTweets() {
         accessTokenKey = keys.twitterKeys.access_token_key,
         accessTokenSecret = keys.twitterKeys.access_token_secret;
 
-    // console.log(consumerKey);
-    // console.log(consumerSecret);
-    // console.log(accessTokenKey);
-    // console.log(accessTokenSecret);
-
     var Twitter = require("twitter");
 
     var client = new Twitter({
@@ -47,14 +42,23 @@ function myTweets() {
         access_token_secret: accessTokenSecret
     });
 
-    var params = { screen_name: 'rickrez22', count: 20 };
+    var user = {screen_name: 'rickrez22'};
 
-    client.get('statuses/user_timeline', params, function(err, tweets, response) {
-        console.log(tweets.length);
+    client.get('statuses/user_timeline', user, function(err, tweets, response) {
         if (!err && response.statusCode == 200) {
-            for (var i = 1; i < tweets.length; i++) {
-                console.log("Tweet #" + i + ": " + tweets[i].text);
+            console.log(
+                        "\n" + 
+                        "=========================================================================================" + 
+                        "\nHere are the 20 latest tweets, with the most recent at the top, from " + user.screen_name + 
+                        "\n=========================================================================================" + 
+                        "\n"
+                        );
+            for (var i = 0; i < 20; i++) {
+                console.log("Tweet #" + (i + 1) + ": " + tweets[i].text);
             }
+            console.log("=========================================================================================" + 
+                        "\n"
+                        );
         } else {
             console.log(err);
         }
@@ -65,34 +69,53 @@ function myTweets() {
 ///////////////////////////////////////////////////
 // SPOTIFY
 ///////////////////////////////////////////////////
-// artist			default = "What's My Age Again?" by Blink 182
-// album name
-// song name
-// preview link of song
-// genre
-
 function spotifyThisSong() {
 
     var spotify = require('spotify');
 
-    var song = process.argv[3];
+    var songName = "";
 
-    spotify.search({type: 'track', query: song}, function(err, data) {
+    var nodeArgs = process.argv;
+
+    for (var i = 3; i < nodeArgs.length; i++) {
+        if (i > 3 && i < nodeArgs.length) {
+            songName = songName + " " + nodeArgs[i];
+        } else {
+            songName += nodeArgs[i];
+        }
+    }
+
+    if (songName == "") {
+        songName = "what's my age again?";
+    }
+
+    var params = {type: "track", query: songName, limit: "1"};
+
+    spotify.search(params, function(err, data) {
         if (!err) {
-            console.log(data.tracks.items);
-            return;
+            console.log(
+                "\n" + 
+                "=========================================================================================" +
+                "\nInformation for " + data.tracks.items[0].name +
+                "\n=========================================================================================" +
+                "\n" +
+                "\nArtist: " + data.tracks.items[0].artists[0].name +
+                "\nAlbum Name: " + data.tracks.items[0].album.name +
+                "\nSong Name: " + data.tracks.items[0].name +
+                "\nPreview link for song: " + data.tracks.items[0].preview_url +
+                "\n" +
+                "\n=========================================================================================" + 
+                "\n"
+            );
         } else {
             console.log(err);
         }
     });
 }
 
-
 ///////////////////////////////////////////////////
 // OMDB
 ///////////////////////////////////////////////////
-// Title			default = "Mr. Nobody"
-
 function movieThis() {
 
     var request = require('request');
@@ -107,22 +130,34 @@ function movieThis() {
         }
     }
 
+    if (movieName == "") {
+        movieName = "Mr. Nobody";
+    }
+
     var queryUrl = 'http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&r=json';
-    console.log(queryUrl);
 
     request(queryUrl, function(error, response, body) {
 
         if (!error && response.statusCode == 200) {
 
-            console.log("Title: " + JSON.parse(body)["Title"] +
+            console.log(
+                "\n" + 
+                "=========================================================================================" +
+                "\nInformation for " + JSON.parse(body)["Title"] +
+                "\n=========================================================================================" +
+                "\n" +
+                "\nTitle: " + JSON.parse(body)["Title"] +
                 "\nYear: " + JSON.parse(body)["Year"] +
-                "\nIMDB Rating: " + JSON.parse(body)["imdbRating"] +
+                "\nRated: " + JSON.parse(body)["Rated"] +
                 "\nCountry: " + JSON.parse(body)["Country"] +
                 "\nLanguage: " + JSON.parse(body)["Language"] +
                 "\nPlot: " + JSON.parse(body)["Plot"] +
                 "\nActors: " + JSON.parse(body)["Actors"] +
-                "\nRotten Tomatoes Rating (NEED TO UPDATE): " + JSON.parse(body)["imdbRating"] +
-                "\nRotten Tomatoes Url(NEED TO UPDATE): " + JSON.parse(body)["Poster"]
+                "\nIMDB Rating: " + JSON.parse(body)["imdbRating"] +
+                "\nPoster URL: " + JSON.parse(body)["Poster"] +
+                "\n" +
+                "\n=========================================================================================" + 
+                "\n"
             );
         }
     });
