@@ -42,23 +42,25 @@ function myTweets() {
         access_token_secret: accessTokenSecret
     });
 
-    var user = {screen_name: 'rickrez22'};
+    var user = { screen_name: 'rickrez22' };
 
     client.get('statuses/user_timeline', user, function(err, tweets, response) {
+
         if (!err && response.statusCode == 200) {
             console.log(
-                        "\n" + 
-                        "=========================================================================================" + 
-                        "\nHere are the 20 latest tweets, with the most recent at the top, from " + user.screen_name + 
-                        "\n=========================================================================================" + 
-                        "\n"
-                        );
+                "\n" +
+                "=========================================================================================" +
+                "\nHere are the 20 latest tweets, with the most recent at the top, from " + user.screen_name +
+                "\n=========================================================================================" +
+                "\n"
+            );
             for (var i = 0; i < 20; i++) {
-                console.log("Tweet #" + (i + 1) + ": " + tweets[i].text);
+                console.log("Tweet #" + (i + 1) + ": " + tweets[i].text + 
+                            "\nCreated at: " + tweets[i].created_at + "\n");
             }
-            console.log("=========================================================================================" + 
-                        "\n"
-                        );
+            console.log("=========================================================================================" +
+                "\n"
+            );
         } else {
             console.log(err);
         }
@@ -89,12 +91,12 @@ function spotifyThisSong() {
         songName = "what's my age again?";
     }
 
-    var params = {type: "track", query: songName, limit: "1"};
+    var params = { type: "track", query: songName, limit: "1" };
 
     spotify.search(params, function(err, data) {
         if (!err) {
             console.log(
-                "\n" + 
+                "\n" +
                 "=========================================================================================" +
                 "\nInformation for " + data.tracks.items[0].name +
                 "\n=========================================================================================" +
@@ -104,7 +106,7 @@ function spotifyThisSong() {
                 "\nSong Name: " + data.tracks.items[0].name +
                 "\nPreview link for song: " + data.tracks.items[0].preview_url +
                 "\n" +
-                "\n=========================================================================================" + 
+                "\n=========================================================================================" +
                 "\n"
             );
         } else {
@@ -141,7 +143,7 @@ function movieThis() {
         if (!error && response.statusCode == 200) {
 
             console.log(
-                "\n" + 
+                "\n" +
                 "=========================================================================================" +
                 "\nInformation for " + JSON.parse(body)["Title"] +
                 "\n=========================================================================================" +
@@ -156,7 +158,7 @@ function movieThis() {
                 "\nIMDB Rating: " + JSON.parse(body)["imdbRating"] +
                 "\nPoster URL: " + JSON.parse(body)["Poster"] +
                 "\n" +
-                "\n=========================================================================================" + 
+                "\n=========================================================================================" +
                 "\n"
             );
         }
@@ -166,3 +168,39 @@ function movieThis() {
 ///////////////////////////////////////////////////
 // FILE COMMANDS
 ///////////////////////////////////////////////////
+function doWhatItSays() {
+
+    var fs = require("fs");
+
+    fs.readFile("random.txt", "utf8", function(error, data) {
+
+        var dataArr = data.split(",");
+
+        var params = { type: "track", query: dataArr[1]};
+
+        var spotify = require('spotify');
+
+        spotify.search(params, function(err, data) {
+            if (!err) {
+                console.log(
+                    "\n" +
+                    "=========================================================================================" +
+                    "\nInformation for " + data.tracks.items[0].name +
+                    "\n=========================================================================================" +
+                    "\n" +
+                    "\nArtist: " + data.tracks.items[0].artists[0].name +
+                    "\nAlbum Name: " + data.tracks.items[0].album.name +
+                    "\nSong Name: " + data.tracks.items[0].name +
+                    "\nPreview link for song: " + data.tracks.items[0].preview_url +
+                    "\n" +
+                    "\n=========================================================================================" +
+                    "\n"
+                );
+            } else {
+                console.log(err);
+            }
+        });
+
+    })
+
+}
