@@ -4,6 +4,7 @@
   "description": "Language interpreter and recognition interface",
   "main": "keys.js",
   "dependencies": {
+    "inquirer": "^1.1.0",
     "request": "^2.72.0",
     "spotify": "^0.3.0",
     "twitter": "^1.3.0"

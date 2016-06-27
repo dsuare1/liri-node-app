@@ -42,7 +42,9 @@ function myTweets() {
         access_token_secret: accessTokenSecret
     });
 
-    var user = { screen_name: 'rickrez22' };
+    var twitterHandle = process.argv[3];
+
+    var user = {screen_name: twitterHandle};
 
     client.get('statuses/user_timeline', user, function(err, tweets, response) {
 
@@ -54,9 +56,9 @@ function myTweets() {
                 "\n=========================================================================================" +
                 "\n"
             );
-            for (var i = 0; i < 20; i++) {
-                console.log("Tweet #" + (i + 1) + ": " + tweets[i].text + 
-                            "\nCreated at: " + tweets[i].created_at + "\n");
+            for (var i = 0; i < tweets.length; i++) {
+                console.log("Tweet #" + (i + 1) + ": " + tweets[i].text +
+                    "\n -Tweeted on: " + tweets[i].created_at + "\n");
             }
             console.log("=========================================================================================" +
                 "\n"
@@ -91,24 +93,28 @@ function spotifyThisSong() {
         songName = "what's my age again?";
     }
 
-    var params = { type: "track", query: songName, limit: "1" };
+    var params = { type: "track", query: songName, limit: "20" };
 
     spotify.search(params, function(err, data) {
+
         if (!err) {
             console.log(
                 "\n" +
                 "=========================================================================================" +
-                "\nInformation for " + data.tracks.items[0].name +
+                "\nInformation for songs named " + songName +
                 "\n=========================================================================================" +
-                "\n" +
-                "\nArtist: " + data.tracks.items[0].artists[0].name +
-                "\nAlbum Name: " + data.tracks.items[0].album.name +
-                "\nSong Name: " + data.tracks.items[0].name +
-                "\nPreview link for song: " + data.tracks.items[0].preview_url +
-                "\n" +
-                "\n=========================================================================================" +
-                "\n"
-            );
+                "\n");
+            for (var i = 0; i < data.tracks.items.length; i++) {
+                console.log(
+                    "Artist: " + data.tracks.items[i].artists[0].name +
+                    "\nAlbum Name: " + data.tracks.items[i].album.name +
+                    "\nSong Name: " + data.tracks.items[i].name +
+                    "\nPreview link for song: " + data.tracks.items[i].preview_url +
+                    "\n" +
+                    "\n=========================================================================================" +
+                    "\n"
+                );
+            }
         } else {
             console.log(err);
         }
@@ -176,26 +182,30 @@ function doWhatItSays() {
 
         var dataArr = data.split(",");
 
-        var params = { type: "track", query: dataArr[1]};
+        var params = { type: "track", query: dataArr[1] };
 
         var spotify = require('spotify');
 
         spotify.search(params, function(err, data) {
+
             if (!err) {
                 console.log(
                     "\n" +
                     "=========================================================================================" +
-                    "\nInformation for " + data.tracks.items[0].name +
+                    "\nInformation for songs named " + dataArr[1] +
                     "\n=========================================================================================" +
-                    "\n" +
-                    "\nArtist: " + data.tracks.items[0].artists[0].name +
-                    "\nAlbum Name: " + data.tracks.items[0].album.name +
-                    "\nSong Name: " + data.tracks.items[0].name +
-                    "\nPreview link for song: " + data.tracks.items[0].preview_url +
-                    "\n" +
-                    "\n=========================================================================================" +
-                    "\n"
-                );
+                    "\n");
+                for (var i = 0; i < data.tracks.items.length; i++) {
+                    console.log(
+                        "Artist: " + data.tracks.items[i].artists[0].name +
+                        "\nAlbum Name: " + data.tracks.items[i].album.name +
+                        "\nSong Name: " + data.tracks.items[i].name +
+                        "\nPreview link for song: " + data.tracks.items[i].preview_url +
+                        "\n" +
+                        "\n=========================================================================================" +
+                        "\n"
+                    );
+                }
             } else {
                 console.log(err);
             }
@@ -204,3 +214,36 @@ function doWhatItSays() {
     })
 
 }
+
+
+
+
+///////////////////////////////////////////////////
+// INQUIRER
+///////////////////////////////////////////////////
+// var inquirer = require("inquirer");
+
+// inquirer.prompt([
+
+//         {
+//             type: "list",
+//             message: "Hello there!  Welcome to Liri, your Language Assistant.  What would you like to do today?",
+//             choices: ["Search Twitter for a user's most recent 20 tweets", "Search the Spotify database for info about a song", "Search the OMDB for info about a movie", "Peruse the contents of the File System"],
+//             name: "userChoice"
+//         },
+
+//     ]).then(function(command) {
+
+//         if (command.userChoice == "Search Twitter for a user's most recent 20 tweets"){
+
+//             inquirer.prompt([
+//                     {
+//                         type:"input",
+//                         message: "Ok, enter a user's Twitter handle (WITHOUT the @ symbol",
+//                         twitterHandle: "handle"
+//                     }
+//                 ])
+
+//         }
+
+//     });
