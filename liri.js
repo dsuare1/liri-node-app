@@ -1,71 +1,98 @@
 var action = process.argv[2];
 
+var inquirer = require("inquirer");
+
+inquirer.prompt([{
+    type: "list",
+    message: "Hello!  Choose an option:",
+    choices: ["Twitter - Look up the most recent 20 tweets for any Twitter user", "Spotify - Search Spotify's database for info about a song", "OMDB - Search the OMDB for info about a movie", "File System - Execute commands on files within this system"],
+    name: "choice"
+}]).then(function(choice) {
+    if (choice.choice == "Twitter - Look up the most recent 20 tweets for any Twitter user") {
+        myTweets();
+    } else if (choice.choice == "Spotify - Search Spotify's database for info about a song") {
+        spotifyThisSong();
+    } else if (choice.choice == "OMDB - Search the OMDB for info about a movie") {
+        movieThis();
+    } else {
+        doWhatItSays();
+    }
+});
+
 ///////////////////////////////////////////////////
 // SWITCH CASES
 ///////////////////////////////////////////////////
-switch (action) {
-    case 'my-tweets':
-        myTweets();
-        break;
+// switch (action) {
+//     case 'my-tweets':
+//         myTweets();
+//         break;
 
-    case 'spotify-this-song':
-        spotifyThisSong();
-        break;
+//     case 'spotify-this-song':
+//         spotifyThisSong();
+//         break;
 
-    case 'movie-this':
-        movieThis();
-        break;
+//     case 'movie-this':
+//         movieThis();
+//         break;
 
-    case 'do-what-it-says':
-        doWhatItSays();
-        break;
-}
+//     case 'do-what-it-says':
+//         doWhatItSays();
+//         break;
+// }
 
 ///////////////////////////////////////////////////
 // TWITTER
 ///////////////////////////////////////////////////
 function myTweets() {
 
-    var keys = require("./keys.js");
+    inquirer.prompt([{
+        type: "input",
+        message: "Ok! Enter a Twitter user's handle:",
+        name: "twitterHandle"
+    }]).then(function(input) {
 
-    var consumerKey = keys.twitterKeys.consumer_key,
-        consumerSecret = keys.twitterKeys.consumer_secret,
-        accessTokenKey = keys.twitterKeys.access_token_key,
-        accessTokenSecret = keys.twitterKeys.access_token_secret;
+        var keys = require("./keys.js");
 
-    var Twitter = require("twitter");
+        var consumerKey = keys.twitterKeys.consumer_key,
+            consumerSecret = keys.twitterKeys.consumer_secret,
+            accessTokenKey = keys.twitterKeys.access_token_key,
+            accessTokenSecret = keys.twitterKeys.access_token_secret;
 
-    var client = new Twitter({
-        consumer_key: consumerKey,
-        consumer_secret: consumerSecret,
-        access_token_key: accessTokenKey,
-        access_token_secret: accessTokenSecret
-    });
+        var Twitter = require("twitter");
 
-    var twitterHandle = process.argv[3];
+        var client = new Twitter({
+            consumer_key: consumerKey,
+            consumer_secret: consumerSecret,
+            access_token_key: accessTokenKey,
+            access_token_secret: accessTokenSecret
+        });
 
-    var user = {screen_name: twitterHandle};
+        var twitterHandle = input.twitterHandle;
 
-    client.get('statuses/user_timeline', user, function(err, tweets, response) {
+        var user = { screen_name: twitterHandle };
 
-        if (!err && response.statusCode == 200) {
-            console.log(
-                "\n" +
-                "=========================================================================================" +
-                "\nHere are the 20 latest tweets, with the most recent at the top, from " + user.screen_name +
-                "\n=========================================================================================" +
-                "\n"
-            );
-            for (var i = 0; i < tweets.length; i++) {
-                console.log("Tweet #" + (i + 1) + ": " + tweets[i].text +
-                    "\n -Tweeted on: " + tweets[i].created_at + "\n");
+        client.get('statuses/user_timeline', user, function(err, tweets, response) {
+
+            if (!err && response.statusCode == 200) {
+                console.log(
+                    "\n" +
+                    "=========================================================================================" +
+                    "\nHere are the 20 latest tweets, with the most recent at the top, from " + user.screen_name +
+                    "\n=========================================================================================" +
+                    "\n"
+                );
+                for (var i = 0; i < tweets.length; i++) {
+                    console.log("Tweet #" + (i + 1) + ": " + tweets[i].text +
+                        "\n -Tweeted on: " + tweets[i].created_at + "\n");
+                }
+                console.log("=========================================================================================" +
+                    "\n"
+                );
+            } else {
+                console.log(err);
             }
-            console.log("=========================================================================================" +
-                "\n"
-            );
-        } else {
-            console.log(err);
-        }
+        });
+
     });
 
 }
@@ -75,49 +102,56 @@ function myTweets() {
 ///////////////////////////////////////////////////
 function spotifyThisSong() {
 
-    var spotify = require('spotify');
+    inquirer.prompt([{
+        type: "input",
+        message: "Great! Type in a song name:",
+        name: "songName"
+    }]).then(function(input) {
 
-    var songName = "";
+        var spotify = require('spotify');
 
-    var nodeArgs = process.argv;
+        var songName = input.songName;
 
-    for (var i = 3; i < nodeArgs.length; i++) {
-        if (i > 3 && i < nodeArgs.length) {
-            songName = songName + " " + nodeArgs[i];
-        } else {
-            songName += nodeArgs[i];
+        // var nodeArgs = process.argv;
+
+        // for (var i = 3; i < nodeArgs.length; i++) {
+        //     if (i > 3 && i < nodeArgs.length) {
+        //         songName = songName + " " + nodeArgs[i];
+        //     } else {
+        //         songName += nodeArgs[i];
+        //     }
+        // }
+
+        if (songName == "") {
+            songName = "what's my age again?";
         }
-    }
 
-    if (songName == "") {
-        songName = "what's my age again?";
-    }
+        var params = { type: "track", query: songName, limit: "20" };
 
-    var params = { type: "track", query: songName, limit: "20" };
+        spotify.search(params, function(err, data) {
 
-    spotify.search(params, function(err, data) {
-
-        if (!err) {
-            console.log(
-                "\n" +
-                "=========================================================================================" +
-                "\nInformation for songs named " + songName +
-                "\n=========================================================================================" +
-                "\n");
-            for (var i = 0; i < data.tracks.items.length; i++) {
+            if (!err) {
                 console.log(
-                    "Artist: " + data.tracks.items[i].artists[0].name +
-                    "\nAlbum Name: " + data.tracks.items[i].album.name +
-                    "\nSong Name: " + data.tracks.items[i].name +
-                    "\nPreview link for song: " + data.tracks.items[i].preview_url +
                     "\n" +
+                    "=========================================================================================" +
+                    "\nInformation for songs named " + songName +
                     "\n=========================================================================================" +
-                    "\n"
-                );
+                    "\n");
+                for (var i = 0; i < data.tracks.items.length; i++) {
+                    console.log(
+                        "Artist: " + data.tracks.items[i].artists[0].name +
+                        "\nAlbum Name: " + data.tracks.items[i].album.name +
+                        "\nSong Name: " + data.tracks.items[i].name +
+                        "\nPreview link for song: " + data.tracks.items[i].preview_url +
+                        "\n" +
+                        "\n=========================================================================================" +
+                        "\n"
+                    );
+                }
+            } else {
+                console.log(err);
             }
-        } else {
-            console.log(err);
-        }
+        });
     });
 }
 
@@ -126,48 +160,55 @@ function spotifyThisSong() {
 ///////////////////////////////////////////////////
 function movieThis() {
 
-    var request = require('request');
+    inquirer.prompt([{
+        type: "input",
+        message: "Awesome! Type in a movie:",
+        name: "movieName"
+    }]).then(function(input) {
 
-    var movieName = "";
+        var request = require('request');
 
-    for (var i = 3; i < process.argv.length; i++) {
-        if (i > 3 && i < process.argv.length) {
-            movieName = movieName + "%20" + process.argv[i];
-        } else {
-            movieName += process.argv[i];
+        var movieName = input.movieName;
+
+        // for (var i = 3; i < process.argv.length; i++) {
+        //     if (i > 3 && i < process.argv.length) {
+        //         movieName = movieName + "%20" + process.argv[i];
+        //     } else {
+        //         movieName += process.argv[i];
+        //     }
+        // }
+
+        if (movieName == "") {
+            movieName = "Mr. Nobody";
         }
-    }
 
-    if (movieName == "") {
-        movieName = "Mr. Nobody";
-    }
+        var queryUrl = 'http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&r=json';
 
-    var queryUrl = 'http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&r=json';
+        request(queryUrl, function(error, response, body) {
 
-    request(queryUrl, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
 
-        if (!error && response.statusCode == 200) {
-
-            console.log(
-                "\n" +
-                "=========================================================================================" +
-                "\nInformation for " + JSON.parse(body)["Title"] +
-                "\n=========================================================================================" +
-                "\n" +
-                "\nTitle: " + JSON.parse(body)["Title"] +
-                "\nYear: " + JSON.parse(body)["Year"] +
-                "\nRated: " + JSON.parse(body)["Rated"] +
-                "\nCountry: " + JSON.parse(body)["Country"] +
-                "\nLanguage: " + JSON.parse(body)["Language"] +
-                "\nPlot: " + JSON.parse(body)["Plot"] +
-                "\nActors: " + JSON.parse(body)["Actors"] +
-                "\nIMDB Rating: " + JSON.parse(body)["imdbRating"] +
-                "\nPoster URL: " + JSON.parse(body)["Poster"] +
-                "\n" +
-                "\n=========================================================================================" +
-                "\n"
-            );
-        }
+                console.log(
+                    "\n" +
+                    "=========================================================================================" +
+                    "\nInformation for " + JSON.parse(body)["Title"] +
+                    "\n=========================================================================================" +
+                    "\n" +
+                    "\nTitle: " + JSON.parse(body)["Title"] +
+                    "\nYear: " + JSON.parse(body)["Year"] +
+                    "\nRated: " + JSON.parse(body)["Rated"] +
+                    "\nCountry: " + JSON.parse(body)["Country"] +
+                    "\nLanguage: " + JSON.parse(body)["Language"] +
+                    "\nPlot: " + JSON.parse(body)["Plot"] +
+                    "\nActors: " + JSON.parse(body)["Actors"] +
+                    "\nIMDB Rating: " + JSON.parse(body)["imdbRating"] +
+                    "\nPoster URL: " + JSON.parse(body)["Poster"] +
+                    "\n" +
+                    "\n=========================================================================================" +
+                    "\n"
+                );
+            }
+        });
     });
 }
 
@@ -214,36 +255,3 @@ function doWhatItSays() {
     })
 
 }
-
-
-
-
-///////////////////////////////////////////////////
-// INQUIRER
-///////////////////////////////////////////////////
-// var inquirer = require("inquirer");
-
-// inquirer.prompt([
-
-//         {
-//             type: "list",
-//             message: "Hello there!  Welcome to Liri, your Language Assistant.  What would you like to do today?",
-//             choices: ["Search Twitter for a user's most recent 20 tweets", "Search the Spotify database for info about a song", "Search the OMDB for info about a movie", "Peruse the contents of the File System"],
-//             name: "userChoice"
-//         },
-
-//     ]).then(function(command) {
-
-//         if (command.userChoice == "Search Twitter for a user's most recent 20 tweets"){
-
-//             inquirer.prompt([
-//                     {
-//                         type:"input",
-//                         message: "Ok, enter a user's Twitter handle (WITHOUT the @ symbol",
-//                         twitterHandle: "handle"
-//                     }
-//                 ])
-
-//         }
-
-//     });
