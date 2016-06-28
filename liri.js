@@ -4,7 +4,7 @@ var inquirer = require("inquirer");
 
 inquirer.prompt([{
     type: "list",
-    message: "Hello!  Choose an option:",
+    message: "Hello and welcome to LIRI, your Language Interpretor.  Choose an option below to get started:",
     choices: ["Twitter - Look up the most recent 20 tweets for any Twitter user", "Spotify - Search Spotify's database for info about a song", "OMDB - Search the OMDB for info about a movie", "File System - Execute commands on files within this system"],
     name: "choice"
 }]).then(function(choice) {
@@ -22,6 +22,9 @@ inquirer.prompt([{
 ///////////////////////////////////////////////////
 // SWITCH CASES
 ///////////////////////////////////////////////////
+
+// leaving this here for future reference
+
 // switch (action) {
 //     case 'my-tweets':
 //         myTweets();
@@ -112,16 +115,6 @@ function spotifyThisSong() {
 
         var songName = input.songName;
 
-        // var nodeArgs = process.argv;
-
-        // for (var i = 3; i < nodeArgs.length; i++) {
-        //     if (i > 3 && i < nodeArgs.length) {
-        //         songName = songName + " " + nodeArgs[i];
-        //     } else {
-        //         songName += nodeArgs[i];
-        //     }
-        // }
-
         if (songName == "") {
             songName = "what's my age again?";
         }
@@ -169,14 +162,6 @@ function movieThis() {
         var request = require('request');
 
         var movieName = input.movieName;
-
-        // for (var i = 3; i < process.argv.length; i++) {
-        //     if (i > 3 && i < process.argv.length) {
-        //         movieName = movieName + "%20" + process.argv[i];
-        //     } else {
-        //         movieName += process.argv[i];
-        //     }
-        // }
 
         if (movieName == "") {
             movieName = "Mr. Nobody";
