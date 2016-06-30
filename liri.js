@@ -118,7 +118,7 @@ function movieThis() {
         if (movieName == "") {
             movieName = "Mr. Nobody";
         }
-        var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&r=json";
+        var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&tomatoes=true&r=json";
         request(queryUrl, function(error, response, body) {
             if (!error && response.statusCode == 200) {
                 console.log(
@@ -134,8 +134,8 @@ function movieThis() {
                     "\nLanguage: " + JSON.parse(body)["Language"] +
                     "\nPlot: " + JSON.parse(body)["Plot"] +
                     "\nActors: " + JSON.parse(body)["Actors"] +
-                    "\nIMDB Rating: " + JSON.parse(body)["imdbRating"] +
-                    "\nPoster URL: " + JSON.parse(body)["Poster"] +
+                    "\nRotten Tomatoes Rating: " + JSON.parse(body)["tomatoRating"] +
+                    "\nRotten Tomatoes URL: " + JSON.parse(body)["tomatoURL"] +
                     "\n" +
                     "\n=========================================================================================" +
                     "\n"
